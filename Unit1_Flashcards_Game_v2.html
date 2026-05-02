@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English 142 — Unit 1 Review Game</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Arial,sans-serif;background:#f0f4f8;min-height:100vh;padding:1rem;display:flex;justify-content:center}
+.wrap{width:100%;max-width:580px}
+
+/* header */
+.hdr{text-align:center;padding:1.5rem 0 1.25rem}
+.hdr-badge{display:inline-block;background:#1e3a5f;color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em;padding:4px 14px;border-radius:20px;margin-bottom:10px}
+.hdr h1{font-size:20px;font-weight:700;color:#1e3a5f;margin-bottom:4px}
+.hdr p{font-size:13px;color:#6b7280}
+
+/* top bar */
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.stats{display:flex;gap:6px}
+.stat{padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700}
+.s-c{background:#d1fae5;color:#065f46}
+.s-w{background:#fee2e2;color:#991b1b}
+.s-n{background:#e0e7ff;color:#3730a3}
+
+/* progress */
+.prog-wrap{margin-bottom:1rem}
+.prog-bar{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:#2563ab;border-radius:3px;transition:width .35s}
+.prog-label{font-size:11px;color:#9ca3af;text-align:right;margin-top:3px}
+
+/* category badge */
+.cat-row{margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.cat-badge{display:inline-block;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:.04em}
+.c-vocab{background:#ede9fe;color:#4c1d95}
+.c-grammar{background:#fef3c7;color:#92400e}
+.c-reading{background:#d1fae5;color:#065f46}
+.c-writing{background:#fce7f3;color:#9d174d}
+.diff-badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;background:#f3f4f6;color:#6b7280}
+
+/* card */
+.scene{perspective:1200px;width:100%;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent}
+.inner{position:relative;width:100%;min-height:210px;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.inner.flipped{transform:rotateY(180deg)}
+.face{position:absolute;width:100%;min-height:210px;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;padding:1.75rem 1.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.face.front{background:#fff;border:1.5px solid #e5e7eb;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.face.back{transform:rotateY(180deg);background:#f8faff;border:1.5px solid #bfdbfe}
+.q-label{font-size:11px;font-weight:600;color:#9ca3af;letter-spacing:.06em;text-transform:uppercase}
+.q-text{font-size:17px;font-weight:600;text-align:center;color:#111827;line-height:1.55}
+.q-hint{font-size:12px;color:#9ca3af;font-style:italic}
+.tap-hint{font-size:12px;color:#2563ab;font-weight:500;margin-top:6px}
+.a-label{font-size:11px;font-weight:700;color:#2563ab;letter-spacing:.06em}
+.a-text{font-size:14px;text-align:center;color:#111827;line-height:1.75}
+.a-text strong{color:#1d4ed8;font-weight:700}
+.a-text .ar{color:#b45309;font-style:italic;font-size:13px}
+.a-text code{background:#eff6ff;color:#1e40af;padding:1px 6px;border-radius:4px;font-size:13px;font-family:monospace}
+
+/* flip hint below card */
+.flip-row{text-align:center;font-size:12px;color:#9ca3af;margin-bottom:12px;min-height:18px}
+
+/* action buttons */
+.actions{display:flex;gap:8px;margin-bottom:10px}
+.btn-w{flex:1;padding:12px;border-radius:12px;border:1.5px solid #fca5a5;background:#fee2e2;color:#991b1b;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.btn-c{flex:1;padding:12px;border-radius:12px;border:1.5px solid #6ee7b7;background:#d1fae5;color:#065f46;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.btn-sk{padding:12px 16px;border-radius:12px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:13px;cursor:pointer;font-family:inherit}
+.actions button:disabled{opacity:.25;cursor:default}
+.btn-w:not(:disabled):active,.btn-c:not(:disabled):active{transform:scale(.97)}
+
+/* counter */
+.ctr{font-size:13px;color:#6b7280;text-align:center;margin-bottom:1.25rem}
+
+/* result */
+.result{display:none;background:#fff;border:1.5px solid #e5e7eb;border-radius:18px;padding:2rem 1.5rem;text-align:center}
+.res-circle{width:110px;height:110px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1rem;border:5px solid #2563ab}
+.res-pct{font-size:34px;font-weight:800;color:#1e3a5f}
+.res-lbl{font-size:10px;font-weight:600;color:#6b7280;letter-spacing:.06em}
+.breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:1.25rem 0}
+.bk{padding:14px 8px;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;text-align:center}
+.bk span{font-size:24px;font-weight:800;color:#1e3a5f;display:block;margin-bottom:2px}
+.bk p{font-size:11px;color:#6b7280;font-weight:600}
+.res-msg{font-size:14px;color:#374151;line-height:1.65;padding:14px 16px;background:#eff6ff;border-radius:12px;border:1px solid #bfdbfe;margin-bottom:1.25rem}
+.res-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.btn-res{padding:11px 22px;border-radius:10px;border:1.5px solid #d1d5db;background:#fff;color:#1e3a5f;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-res:hover{background:#f3f4f6}
+.btn-res.primary{background:#1e3a5f;color:#fff;border-color:#1e3a5f}
+.btn-res.primary:hover{background:#2563ab}
+
+/* category breakdown in result */
+.cat-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:1rem 0}
+.cb{padding:10px;border-radius:10px;text-align:center;font-size:12px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hdr">
+    <div class="hdr-badge">ENGLISH 142 · KUWAIT UNIVERSITY</div>
+    <h1>Unit 1: Happiness — Review Game</h1>
+    <p>28 flashcards · Vocabulary · Grammar · Reading · Writing</p>
+  </div>
+
+  <div id="game">
+    <div class="top-bar">
+      <div class="stats">
+        <span class="stat s-c" id="s-c">0 ✓</span>
+        <span class="stat s-w" id="s-w">0 ✗</span>
+      </div>
+      <span class="stat s-n" id="s-left">28 left</span>
+    </div>
+
+    <div class="prog-wrap">
+      <div class="prog-bar"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+      <div class="prog-label" id="prog-label">0 / 28</div>
+    </div>
+
+    <div class="cat-row">
+      <span class="cat-badge c-vocab" id="cat-badge">VOCABULARY</span>
+      <span class="diff-badge" id="diff-badge">⭐</span>
+    </div>
+
+    <div class="scene" id="scene" onclick="flip()">
+      <div class="inner" id="inner">
+        <div class="face front">
+          <div class="q-label">Question</div>
+          <div class="q-text" id="q-text"></div>
+          <div class="q-hint" id="q-hint"></div>
+          <div class="tap-hint" id="tap-hint">Tap to reveal answer</div>
+        </div>
+        <div class="face back">
+          <div class="a-label">ANSWER</div>
+          <div class="a-text" id="a-text"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-row" id="flip-row">Tap the card to see the answer</div>
+
+    <div class="actions">
+      <button class="btn-w" id="bw" onclick="mark(false)" disabled>✗ &nbsp; Didn't know</button>
+      <button class="btn-sk" onclick="skip()">Skip</button>
+      <button class="btn-c" id="bc" onclick="mark(true)" disabled>✓ &nbsp; Got it!</button>
+    </div>
+    <div class="ctr" id="ctr">Card 1 of 28</div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="res-circle">
+      <div class="res-pct" id="r-pct">0%</div>
+      <div class="res-lbl">SCORE</div>
+    </div>
+    <div style="font-size:15px;font-weight:600;color:#1e3a5f;margin-bottom:4px" id="r-title">Unit 1 Complete!</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:1rem" id="r-sub"></div>
+    <div class="breakdown">
+      <div class="bk"><span id="r-c">0</span><p>Correct</p></div>
+      <div class="bk"><span id="r-w">0</span><p>Wrong</p></div>
+      <div class="bk"><span id="r-s">0</span><p>Skipped</p></div>
+    </div>
+    <div class="cat-breakdown">
+      <div class="cb c-vocab" id="cb-vocab" style="border:1px solid #c4b5fd">Vocab: 0/11</div>
+      <div class="cb c-grammar" id="cb-grammar" style="border:1px solid #fde68a">Grammar: 0/8</div>
+      <div class="cb c-reading" id="cb-reading" style="border:1px solid #6ee7b7">Reading: 0/6</div>
+      <div class="cb c-writing" id="cb-writing" style="border:1px solid #fbcfe8">Writing: 0/3</div>
+    </div>
+    <div class="res-msg" id="r-msg"></div>
+    <div class="res-btns">
+      <button class="btn-res primary" onclick="restart()">Play Again (Shuffled)</button>
+      <button class="btn-res" onclick="retryWrong()">Retry Wrong Cards Only</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const ALL=[
+  // ─── VOCABULARY (11) ───────────────────────────────────────────
+  {c:"vocab",d:1,q:"What does 'access' mean? Give its part of speech and a preposition that always follows it.",h:"Noun — always followed by ___",
+   a:"<strong>Noun</strong> — The right or ability to use or enter something.<br>Always followed by <code>to</code>: access <strong>to</strong> education, access <strong>to</strong> healthcare.<br><span class='ar'>الوصول إلى شيء ما</span>"},
+
+  {c:"vocab",d:1,q:"What are 'basic necessities'? Give three examples.",h:"Noun phrase — essential things to live",
+   a:"<strong>The most fundamental things people need to survive.</strong><br>Examples: food, shelter, healthcare (not luxuries — the essentials).<br><em>'The government provides basic necessities for all citizens.'</em><br><span class='ar'>الاحتياجات الأساسية</span>"},
+
+  {c:"vocab",d:1,q:"What is the difference between 'poor' and 'poverty'?",h:"Word forms — adjective vs noun",
+   a:"<strong>poor</strong> = adjective: <em>He is poor.</em><br><strong>poverty</strong> = noun: <em>She lives in poverty.</em><br>Same pattern: free → freedom / secure → security / equal → equality<br><span class='ar'>poor = فقير (صفة) | poverty = الفقر (اسم)</span>"},
+
+  {c:"vocab",d:1,q:"Define 'standard of living'. How do you use it in a sentence?",h:"Noun phrase",
+   a:"<strong>The overall level of comfort and wealth available to someone.</strong><br><em>'Singapore provides a high standard of living for all citizens.'</em><br>You raise, improve, or maintain a standard of living.<br><span class='ar'>مستوى المعيشة</span>"},
+
+  {c:"vocab",d:2,q:"What is the noun form of 'secure'? Use both in sentences.",h:"secure → ?",
+   a:"<strong>secure</strong> (adj): <em>It is a secure and safe environment.</em><br><strong>security</strong> (noun): <em>The government provides security for its people.</em><br>Meaning: safe, stable, protected from danger.<br><span class='ar'>secure = آمن | security = الأمان</span>"},
+
+  {c:"vocab",d:1,q:"What does 'socialize' mean? What is its third-person singular form?",h:"Verb",
+   a:"<strong>To spend time with others in a friendly, social way.</strong><br>Third person: <code>she socializes</code> / <code>he socializes</code><br><em>'People in Mexico socialize with family and friends a lot.'</em><br><span class='ar'>يُخالط الناس اجتماعياً</span>"},
+
+  {c:"vocab",d:2,q:"What is a 'happy medium'? Where does this phrase appear in the reading?",h:"From Reading 1 — Dr. Tan's quote",
+   a:"<strong>A satisfying balance between two extremes — a middle point.</strong><br>From the text: Dr. Tan Ern Ser says Singapore has found a 'happy medium' between personal freedom and strict rules / security.<br><span class='ar'>التوازن بين طرفين متضادين</span>"},
+
+  {c:"vocab",d:1,q:"What does 'provide' mean? What preposition comes after it?",h:"Verb",
+   a:"<strong>To supply or make something available to someone.</strong><br>Two patterns:<br><code>provide something TO someone</code><br><code>provide someone WITH something</code><br><em>'The government provides housing to all citizens.'</em><br><span class='ar'>يوفر / يُقدّم</span>"},
+
+  {c:"vocab",d:2,q:"What does 'interaction' mean? What is its verb form?",h:"Noun — verb form is ?",
+   a:"<strong>Direct communication or involvement between people or groups.</strong><br>Verb form: <code>interact</code> → <em>They interact with each other daily.</em><br><em>'Social interaction is essential for mental wellbeing.'</em><br><span class='ar'>تفاعل / تواصل</span>"},
+
+  {c:"vocab",d:2,q:"What does 'strict' mean? Give an adverb form and use it in a sentence.",h:"Adjective — adverb: strictly",
+   a:"<strong>Demanding obedience to rules — not lenient or flexible.</strong><br>Adverb: <code>strictly</code> → <em>'It is strictly forbidden to litter.'</em><br><em>'Singapore has very strict laws about smoking in public.'</em><br><span class='ar'>صارم / متشدد</span>"},
+
+  {c:"vocab",d:2,q:"What is 'relative wealth' and why does it matter for happiness in Mexico?",h:"Concept from Reading 1",
+   a:"<strong>Relative wealth = how much money you have COMPARED to the people around you.</strong><br>In Mexico, most people live near others in similar situations, so there is no social pressure to have more expensive things.<br>This matters more than absolute wealth for happiness.<br><span class='ar'>الثروة النسبية — ما تملكه مقارنةً بمن حولك</span>"},
+
+  // ─── GRAMMAR (8) ───────────────────────────────────────────────
+  {c:"grammar",d:1,q:"Correct this sentence and explain the rule:\n'She doesn't goes to the gym every morning.'",h:"After doesn't → ?",
+   a:"<strong>She doesn't go to the gym every morning. ✓</strong><br>Rule: After <code>doesn't</code> → ALWAYS use the BASE verb. Never add -s or -es.<br><em>'doesn't goes'</em> ❌ — one of the most common errors!<br>Pattern: He/She/It + doesn't + BASE VERB"},
+
+  {c:"grammar",d:1,q:"Correct this sentence:\n'I am knowing the answer.'",h:"What type of verb is 'know'?",
+   a:"<strong>I know the answer. ✓</strong><br><code>know</code> is a stative verb — it describes a mental STATE, not an action.<br>Stative verbs are NEVER used in -ing form.<br>Other stative verbs: believe, love, hate, own, understand, want, need"},
+
+  {c:"grammar",d:1,q:"Correct this sentence:\n'People in Singapore lives in a very safe environment.'",h:"What is the subject? Singular or plural?",
+   a:"<strong>People in Singapore live in a very safe environment. ✓</strong><br>Rule: <code>People</code> = plural subject → base verb (no -s).<br>Only He / She / It (third person singular) gets the -s.<br>Singular: The government <strong>provides</strong> — Plural: People <strong>provide</strong>"},
+
+  {c:"grammar",d:2,q:"What is the difference between these two sentences?\n(a) 'I think Kuwait is beautiful.'\n(b) 'She is thinking about her answer.'",h:"Dual-function verb — think",
+   a:"<strong>(a) 'I think Kuwait is beautiful.'</strong> = opinion/belief → STATIVE meaning → no -ing ✓<br><strong>(b) 'She is thinking about her answer.'</strong> = active mental process happening now → -ing OK ✓<br>Same word, different meaning = different grammar rule."},
+
+  {c:"grammar",d:1,q:"Which of these are stative verbs (never use -ing)?\nknow / run / own / eat / believe / play / love / write",h:"Five categories of stative verbs",
+   a:"<strong>Stative: know, own, believe, love ✓</strong><br><strong>Action (can use -ing): run, eat, play, write ✓</strong><br>Five stative categories: mental states, emotions, senses (involuntary), possession, description/state.<br>Test: does it describe a STATE or an ACTION?"},
+
+  {c:"grammar",d:1,q:"Give the complete formula for Simple Present:\nPositive / Negative / Question\n(for I/You/We/They AND He/She/It)",h:"All forms",
+   a:"<strong>I/You/We/They:</strong><br>+ They work. &nbsp;− They don't work. &nbsp;? Do they work?<br><br><strong>He/She/It:</strong><br>+ She works. &nbsp;− She doesn't work. &nbsp;? Does she work?<br><br>After <code>does/doesn't</code> → always BASE verb!"},
+
+  {c:"grammar",d:2,q:"What are the spelling rules for adding -s/-es/-ies to verbs?",h:"Third person singular spelling",
+   a:"<strong>Most verbs:</strong> just add -s → works, reads, helps<br><strong>Ends in -ch/-sh/-x/-o/-ss:</strong> add -es → teaches, washes, goes, misses<br><strong>Consonant + y:</strong> change y → ies → study→studies<br><strong>Vowel + y:</strong> just add -s → play→plays"},
+
+  {c:"grammar",d:2,q:"Correct ALL errors in this sentence:\n'Do she usually goes to the library on Fridays?'",h:"Two errors in this sentence",
+   a:"<strong>Does she usually go to the library on Fridays? ✓</strong><br>Error 1: <em>Do she</em> → should be <code>Does she</code> (third person singular → Does)<br>Error 2: <em>goes</em> → should be <code>go</code> (after Does → base verb)<br>Two errors, one sentence — watch carefully!"},
+
+  // ─── READING (6) ───────────────────────────────────────────────
+  {c:"reading",d:1,q:"What is the MAIN IDEA of Reading 1 'Is There a Recipe for Happiness?'",h:"The most important message of the whole reading",
+   a:"<strong>There is no single recipe for happiness.</strong><br>Happiness means different things to different people and cultures. Singapore found it through safety and security. Mexico found it through social connection. Both paths are valid."},
+
+  {c:"reading",d:1,q:"Why is Singapore happy despite its very strict rules?",h:"Two main reasons",
+   a:"<strong>1. The government provides basic necessities for everyone</strong> — housing, healthcare, income top-ups for lower earners — almost no extreme poverty.<br><strong>2. Roughly equal standards of living</strong> — closely connected families, no extreme wealth gap.<br>People traded some personal freedom for stability and security."},
+
+  {c:"reading",d:2,q:"Why is Mexico happy despite widespread poverty?",h:"Two key concepts",
+   a:"<strong>1. Strong social interaction</strong> — constant socializing with family and friends creates a genuine sense of belonging and community.<br><strong>2. Relative wealth</strong> — most Mexicans live near others in a similar situation, so there is no social pressure to have more expensive possessions."},
+
+  {c:"reading",d:1,q:"Name the Four Keys to Happiness from Reading 2. Give one example of each.",h:"Research-backed findings",
+   a:"<strong>1. Giving</strong> — volunteering, helping a friend, donating<br><strong>2. Relating</strong> — calling a family member, maintaining friendships<br><strong>3. Exercising</strong> — a 30-min walk 3x a week improves mood measurably<br><strong>4. Noticing</strong> — writing 3 good things from your day (gratitude practice)"},
+
+  {c:"reading",d:2,q:"What is the difference between a MAIN IDEA and a SUPPORTING DETAIL?",h:"Reading skill — identifying main idea",
+   a:"<strong>Main idea</strong> = the most important claim — the UMBRELLA that covers the whole paragraph. Remove it and the paragraph loses its centre.<br><strong>Detail</strong> = a specific fact, example, or statistic that supports the main idea.<br>Example: 'Mexico is happy because of social bonds' = MAIN IDEA<br>'Smiling at a neighbor increases happiness' = DETAIL"},
+
+  {c:"reading",d:2,q:"Where is the main idea usually found in a paragraph?",h:"Three possible positions",
+   a:"<strong>First sentence (~60%)</strong> — called the topic sentence, introduces the paragraph's focus.<br><strong>Last sentence (~25%)</strong> — a conclusion that wraps up the argument.<br><strong>Middle (~15%)</strong> — the trickiest position.<br>Always read the WHOLE paragraph before deciding — never assume it's the first sentence."},
+
+  // ─── WRITING (3) ───────────────────────────────────────────────
+  {c:"writing",d:1,q:"What are the TWO required parts of a strong topic sentence?",h:"Writing skill",
+   a:"<strong>1. The TOPIC</strong> — what the paragraph is about<br><strong>2. The CONTROLLING IDEA</strong> — what specific claim you are making<br><br>Weak: 'Singapore is happy.' (topic only — no direction)<br>Strong: 'Singapore is happy because the government ensures safety and equal living standards for all citizens.' (topic + controlling idea)"},
+
+  {c:"writing",d:2,q:"What is wrong with this topic sentence?\n'In this paragraph I will talk about happiness in Kuwait.'",h:"Common mistake — type of error?",
+   a:"<strong>This is an announcement sentence — never use this in academic writing. ❌</strong><br>You must not announce what you will do — just do it directly.<br>Fix it: 'People in Kuwait find happiness primarily through family bonds, social gatherings, and a strong sense of community.' ✓"},
+
+  {c:"writing",d:2,q:"Which topic sentence is stronger and why?\n(a) 'There are many factors that affect happiness.'\n(b) 'Research shows that building strong social relationships is the most reliable path to lasting happiness.'",h:"Evaluate — which has a controlling idea?",
+   a:"<strong>(b) is much stronger. ✓</strong><br>(a) is too vague — it says nothing specific. Any paragraph could follow it.<br>(b) gives a clear topic (factors of happiness) AND a specific controlling idea (social relationships = most reliable path). The reader knows exactly what the paragraph will argue.<br>Strong topic sentences take a position."},
+];
+
+const catCounts={vocab:0,grammar:0,reading:0,writing:0};
+const catCorrect={vocab:0,grammar:0,reading:0,writing:0};
+ALL.forEach(c=>catCounts[c.c]++);
+
+let deck,idx,correct,wrong,skipped,wrongCards,isFlipped;
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+const catLabel={vocab:"VOCABULARY",grammar:"GRAMMAR",reading:"READING",writing:"WRITING"};
+const catClass={vocab:"c-vocab",grammar:"c-grammar",reading:"c-reading",writing:"c-writing"};
+const diffLabel={1:"⭐ Core",2:"⭐⭐ Harder"};
+
+function load(){
+  if(idx>=deck.length){showResult();return;}
+  const card=deck[idx];
+  const badge=document.getElementById("cat-badge");
+  badge.textContent=catLabel[card.c]||card.c;
+  badge.className="cat-badge "+(catClass[card.c]||"c-vocab");
+  document.getElementById("diff-badge").textContent=diffLabel[card.d]||"⭐";
+  document.getElementById("q-text").textContent=card.q;
+  document.getElementById("q-hint").textContent=card.h?"Hint: "+card.h:"";
+  document.getElementById("a-text").innerHTML=card.a;
+  document.getElementById("inner").classList.remove("flipped");
+  document.getElementById("bw").disabled=true;
+  document.getElementById("bc").disabled=true;
+  document.getElementById("flip-row").textContent="Tap the card to see the answer";
+  document.getElementById("tap-hint").style.display="block";
+  const total=deck.length;
+  document.getElementById("ctr").textContent="Card "+(idx+1)+" of "+total;
+  document.getElementById("prog").style.width=Math.round((idx/total)*100)+"%";
+  document.getElementById("prog-label").textContent=idx+" / "+total+" completed";
+  document.getElementById("s-left").textContent=(total-idx)+" left";
+  isFlipped=false;
+}
+
+function flip(){
+  if(isFlipped)return;
+  isFlipped=true;
+  document.getElementById("inner").classList.add("flipped");
+  document.getElementById("bw").disabled=false;
+  document.getElementById("bc").disabled=false;
+  document.getElementById("flip-row").textContent="Did you know this?";
+  document.getElementById("tap-hint").style.display="none";
+}
+
+function mark(ok){
+  const card=deck[idx];
+  if(ok){correct++;catCorrect[card.c]=(catCorrect[card.c]||0)+1;}
+  else{wrong++;wrongCards.push(card);}
+  document.getElementById("s-c").textContent=correct+" ✓";
+  document.getElementById("s-w").textContent=wrong+" ✗";
+  idx++;load();
+}
+
+function skip(){skipped++;idx++;load();}
+
+function showResult(){
+  document.getElementById("game").style.display="none";
+  const r=document.getElementById("result");
+  r.style.display="block";
+  const total=deck.length,pct=total>0?Math.round((correct/total)*100):0;
+  document.getElementById("r-pct").textContent=pct+"%";
+  document.getElementById("r-sub").textContent=correct+" correct out of "+total+" cards";
+  document.getElementById("r-c").textContent=correct;
+  document.getElementById("r-w").textContent=wrong;
+  document.getElementById("r-s").textContent=skipped;
+  const cats=["vocab","grammar","reading","writing"];
+  cats.forEach(c=>{
+    const tot=deck.filter(x=>x.c===c).length;
+    const cor=catCorrect[c]||0;
+    const label={vocab:"Vocab",grammar:"Grammar",reading:"Reading",writing:"Writing"}[c];
+    document.getElementById("cb-"+c).textContent=label+": "+cor+"/"+tot;
+  });
+  const msgs=[
+    "Don't give up! Go back through the video notes and try again — you'll get there.",
+    "Keep going! Review the grammar videos and vocabulary list, then try again.",
+    "Good work! Review the cards you got wrong and you'll be ready for Test 1.",
+    "Excellent! You are well prepared for Test 1 on October 9th. Keep it up!"
+  ];
+  document.getElementById("r-msg").textContent=msgs[pct<50?0:pct<70?1:pct<90?2:3];
+}
+
+function restart(){
+  Object.keys(catCorrect).forEach(k=>catCorrect[k]=0);
+  deck=shuffle([...ALL]);idx=0;correct=0;wrong=0;skipped=0;wrongCards=[];
+  document.getElementById("s-c").textContent="0 ✓";
+  document.getElementById("s-w").textContent="0 ✗";
+  document.getElementById("game").style.display="block";
+  document.getElementById("result").style.display="none";
+  load();
+}
+
+function retryWrong(){
+  if(!wrongCards||wrongCards.length===0){restart();return;}
+  Object.keys(catCorrect).forEach(k=>catCorrect[k]=0);
+  deck=shuffle([...wrongCards]);idx=0;correct=0;wrong=0;skipped=0;wrongCards=[];
+  document.getElementById("s-c").textContent="0 ✓";
+  document.getElementById("s-w").textContent="0 ✗";
+  document.getElementById("game").style.display="block";
+  document.getElementById("result").style.display="none";
+  load();
+}
+
+restart();
+</script>
+</body>
+</html>
